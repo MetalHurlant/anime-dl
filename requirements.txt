@@ -1,4 +1,4 @@
 argparse
-cfscrape
+cloudscraper
 bs4
 tqdm

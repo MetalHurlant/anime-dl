@@ -71,7 +71,7 @@ and then, execute with this :
 `./__main__.py`
 
 ## Python Support
-This script supports only Pythom 3 currently..
+This script supports only Python 3 currently.
 
 ## Windows Binary
 It is recommended that windows users use this binary to save both, your head and time from installing all the dependencies. 

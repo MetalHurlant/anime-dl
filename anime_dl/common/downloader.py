@@ -1,25 +1,23 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from cfscrape import create_scraper
-from requests import session
+import cloudscraper
 from tqdm import tqdm
 
 
 class Downloader(object):
 
-    def file_downloader(self, ddl, file_name, referer, cookies):
+    @staticmethod
+    def file_downloader(ddl, file_name, referer, cookies):
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/57.0.2987.133 Safari/537.36',
             'Territory': 'US',
             'Referer': referer
         }
 
-        sess = session()
-        sess = create_scraper(sess)
+        sess = cloudscraper.create_scraper()
 
         dlr = sess.get(ddl, stream=True, cookies = cookies, headers = headers)  # Downloading the content using python.
         with open(file_name, "wb") as handle:
             for data in tqdm(dlr.iter_content(chunk_size=1024)):  # Added chunk size to speed up the downloads
                 handle.write(data)
-        print("Download has been completed.")  # Viola
+        print("Download has been completed.")  # Voila

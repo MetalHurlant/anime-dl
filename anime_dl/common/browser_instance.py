@@ -1,24 +1,20 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from cfscrape import create_scraper
-from requests import session
+import cloudscraper
 from bs4 import BeautifulSoup
 import re
 
 
-def page_downloader(url, scrapper_delay=5, **kwargs):
+def page_downloader(url, **kwargs):
     headers = kwargs.get("headers")
     received_cookies = kwargs.get("cookies")
     if not headers:
         headers = {
-            'User-Agent':
-                'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
             'Accept-Encoding': 'gzip, deflate'
         }
 
-    sess = session()
-    sess = create_scraper(sess, delay=scrapper_delay)
+    sess = cloudscraper.create_scraper()
 
     connection = sess.get(url, headers=headers, cookies=received_cookies)
 
@@ -37,15 +33,12 @@ def page_downloader(url, scrapper_delay=5, **kwargs):
 
 def login_crunchyroll(url, username, password, country):
     headers = {
-        'user-agent':
-            'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.87 Safari/537.36',
         'referer': 'https://www.crunchyroll.com/login',
         'origin': 'https://www.crunchyroll.com',
         'upgrade-insecure-requests': '1'
     }
 
-    sess = session()
-    sess = create_scraper(sess)
+    sess = cloudscraper.create_scraper()
     print("Trying to login...")
 
     initial_page_fetch = sess.get(url='https://www.crunchyroll.com/login', headers=headers)

@@ -5,14 +5,14 @@
 #check if root
 #https://askubuntu.com/questions/15853/how-can-a-script-check-if-its-being-run-as-root
 is_root() {
-	if ! [ $(id -u) = 0 ]; then
+	if ! [ "$(id -u)" = 0 ]; then
 		echo "Please run this script as root."
 		echo "Running \'sudo\' on this script..."
 
 		SCRIPT_NAME=$(basename "$0")
 		
 		CMD="sudo ./${SCRIPT_NAME}"
-		eval ${CMD}
+		eval "${CMD}"
 		exit $?
 	fi
 }
@@ -26,7 +26,7 @@ distro_check() {
 	PKG_INSTALL=""
 
 	if command -v apt-get &> /dev/null; then
-		DISTRO_OS=(${DISTRO_DEBIAN})
+		DISTRO_OS=("${DISTRO_DEBIAN}")
 		PKG_MANAGER="apt-get"
 		PKG_INSTALL="${PKG_MANAGER} --yes --no-install-recommends install"
 #	elif command -v rpm &> /dev/null; then
@@ -40,7 +40,7 @@ distro_check() {
 		exit
 	fi
 
-	if [ ${DISTRO_OS} == ${DISTRO_DEBIAN} ]; then
+	if [ "${DISTRO_OS[0]}" == ${DISTRO_DEBIAN} ]; then
 		return 0;
 	else
 		echo "Your linux distro either isn\'t supported, or somebody didn\'t finish coding the distro_check..."
@@ -56,7 +56,7 @@ get_distro() {
 	DISTRO_DEBIAN_9=2
 	RETURN=-1
 
-	if [ ${DISTRO_OS} == ${DISTRO_DEBIAN} ]; then
+	if [ "${DISTRO_OS[0]}" == ${DISTRO_DEBIAN} ]; then
 		lsb_release -a > tmp_distro
 		if grep "stretch" tmp_distro; then
 			RETURN=${DISTRO_DEBIAN_9}
@@ -128,9 +128,7 @@ install_pip() {
 }
 
 install_dependencies() {
-	pip install cfscrape
-	pip install tqdm
-	pip install bs4
+	pip install -r anime-dl/requirements.txt
 }
 
 ensure_animedl_installed() {
@@ -140,7 +138,7 @@ ensure_animedl_installed() {
 	SCRIPTS_DIR="anime-dl/anime_dl/"
 	RETURN=1
 	
-	cd ${SCRIPTS_DIR}
+	cd ${SCRIPTS_DIR}  || exit
 	./__main__.py --help > ../../tmp_help
 	cd ..; cd ..
 
@@ -168,8 +166,8 @@ if [ $? == 0 ]; then
 	install_nodejs
 	install_curl
 	install_pip
-	install_dependencies
 	install_animedl
+	install_dependencies
 	ensure_animedl_installed
 	exit $?
 else
