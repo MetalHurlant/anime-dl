@@ -77,7 +77,7 @@ class Crunchyroll(object):
                     print('[anime-dl] File Exists! Skipping {0}\n'.format(file_name))
                     pass
                 else:
-                    subs_downloaded = supporters.sub_fetcher.crunchyroll_subs(xml=str(xml_page_connect), episode_number=episode_number, file_name=file_name)
+                    subs_downloaded = supporters.sub_fetcher.crunchyroll_subs(xml=str(xml_page_connect), episode_number=episode_number, file_name=file_name, url=url)
                     if not subs_downloaded:
                         pass
                     m3u8_downloaded = self.m3u8_downloader(url=m3u8_file_link, cookies=cookies, resolution_to_find=resolution_to_find, file_name=file_name)

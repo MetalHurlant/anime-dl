@@ -11,7 +11,7 @@ def crunchyroll_name(anime_name, episode_number, resolution):
     #           str(episode_number).strip() + " [" + str(resolution) + "]"
 
     file_name = str(re.sub(r'[^A-Za-z0-9\ \-\' \\]+', '', str(anime_name))).title().strip().replace("Season ", "S") \
-                + " - " + str(episode_number.zfill(2)).strip() + " [" + str(resolution) + "].mp4"
+                + "-" + str(episode_number.zfill(2)).strip() + "[" + str(resolution) + "].mp4"
 
     try:
         max_path = int(subprocess.check_output(['getconf', 'PATH_MAX', '/']))
@@ -21,4 +21,4 @@ def crunchyroll_name(anime_name, episode_number, resolution):
     if len(file_name) > max_path:
         file_name = file_name[:max_path]
 
-    return file_name
+    return file_name.strip().replace(" ", "_")

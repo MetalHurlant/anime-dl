@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import json
 
 import anime_dl.common
 from anime_dl.external.aes import aes_cbc_decrypt
@@ -14,32 +15,21 @@ from hashlib import sha1
 from math import pow, sqrt, floor
 
 
-def crunchyroll_subs(xml, episode_number, file_name):
-    headers = {
-        'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_1) AppleWebKit/601.2.7 (KHTML, like Gecko) Version/9.0.1 Safari/601.2.7',
-        'Referer':
-            'https://www.crunchyroll.com'
-    }
-    for sub_id, sub_lang, sub_lang2 in re.findall(
-            r'subtitle_script_id\=(.*?)\"\ title\=\"\[(.*?)\]\ (.*?)\"',
-            str(xml)):
-        xml_return = anime_dl.common.browser_instance.page_downloader(url="http://www.crunchyroll.com/xml/?req=RpcApiSubtitle_GetXml&subtitle_script_id={0}".format(sub_id), headers=headers)
+def crunchyroll_subs(xml, episode_number, file_name, url=''):
+    _, page_source, received_cookies = anime_dl.common.browser_instance.page_downloader(url=f"{url}?skip_wall=1")
+    data = json.loads(re.search('vilos\.config\.media = ({.+})?', str(page_source.contents)).group(1))
+    subtitles = data.get('subtitles')
 
-        iv = str(re.search(r'\<iv\>(.*?)\<\/iv\>', str(xml_return)).group(1)).strip()
-        data = str(re.search(r'\<data\>(.*?)\<\/data\>', str(xml_return)).group(1)).strip()
-        subtitle = _decrypt_subtitles(data, iv, sub_id).decode('utf-8')
-        sub_root = compat_etree_fromstring(subtitle)
-        sub_data = _convert_subtitles_to_ass(sub_root)
-        lang_code = str(
-            re.search(r'lang_code\=\"(.*?)\"', str(subtitle)).group(
-                1)).strip()
+    for subtitle in subtitles:
+        lang_code = subtitle['language']
         sub_file_name = str(file_name).replace(".mp4", ".") + str(lang_code) + ".ass"
+        print("Downloading sub {0} ...".format(sub_file_name))
 
-        print("Downloading {0} ...".format(sub_file_name))
-
+        _, sub_page, _ = anime_dl.common.browser_instance.page_downloader(url=subtitle['url'])
+        sub_data = str(sub_page.contents[0])
         try:
-            with open(str(os.getcwd()) + "/" + str(sub_file_name), "wb") as sub_file:
+            sub_file_path = os.path.join(os.getcwd(), str(sub_file_name))
+            with open(sub_file_path, "wb") as sub_file:
                 sub_file.write(sub_data.encode("utf-8"))
         except Exception as EncodingException:
             print("Couldn't write the subtitle file...skipping.")
